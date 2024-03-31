@@ -1,0 +1,98 @@
+entity T_TEMPMUX is
+
+end T_TEMPMUX;
+
+
+architecture test of T_TEMPMUX is
+component THERMOSTAT_pins is
+
+port (current_temp : in bit_vector(6 downto 0);
+      desired_temp : in bit_vector(6 downto 0);
+      display_select : in bit;
+      COOL         : in bit;
+      HEAT         : in bit;
+      temp_display : out bit_vector(6 downto 0);
+      A_C_ON       : out Boolean;
+      FURNACE_ON   : out Boolean);
+
+end component;
+
+signal current_temp , desired_temp , temp_display : bit_vector(6 downto 0);
+signal display_select , COOL , HEAT : bit;
+signal A_C_ON , FURNACE_ON : Boolean;
+
+begin 
+
+UUT : THERMOSTAT_pins port map ( current_temp => current_temp,
+                                 desired_temp => desired_temp,
+				 display_select => display_select,
+				 temp_display => temp_display,
+				 COOL => COOL,
+				 HEAT => HEAT,
+				 A_C_ON => A_C_ON,
+				 FURNACE_ON => FURNACE_ON);
+
+--> test functionality:
+--> a. testing the temp_display.
+--> b. testing the A/C.
+--> c. testing the FURNACE.
+
+TEST_PROC : process
+begin 
+
+--> a. testing the temp_display:
+
+-->    1. assign the current_temp and the desired_temp with different values
+current_temp <= "1010101";
+desired_temp <= "0101010";
+-->    2. assign display_select with '0'
+display_select <= '0';
+-->    3. wait for 10 ns
+wait for 10 ns;
+-->    4. assign display_select with '1'
+display_select <= '1';
+-->    5. wait for 10 ns
+wait for 10 ns;
+
+-----------------------------------------------------------------------------------
+
+--> b. testing the A/C:
+
+-->    1. setting the COOL bit
+COOL <= '1';
+-->    2. assign the desired_temp with value greater than the current_temp -> A/C = OFF
+desired_temp <= "0000111";
+current_temp <= "0000001";
+-->    3. wait for 10 ns
+wait for 10 ns;
+-->    4. assign the current_temp with value greater than the desired_temp -> A/C = ON
+desired_temp <= "0000001";
+current_temp <= "0000111";
+-->    5. wait for 10 ns
+wait for 10 ns;
+-->    6. resetting the COOL bit -> A/C = OFF
+COOL <= '0';
+
+
+-----------------------------------------------------------------------------------
+--> c. testing the FURNACE:
+
+-->    1. setting the HEAT bit
+HEAT <= '1';
+-->    2. assign the desired_temp with value less than the current_temp -> FURNACE = OFF
+desired_temp <= "0000001";
+current_temp <= "0000111";
+-->    3. wait for 10 ns
+wait for 10 ns;
+-->    4. assign the current_temp with value less than the desired_temp -> FURNACE = ON
+desired_temp <= "0000111";
+current_temp <= "0000001";
+-->    5. wait for 10 ns
+wait for 10 ns;
+-->    6. resetting the HEAT bit -> FURNACE = OFF
+HEAT <= '0';
+
+end process TEST_PROC;
+
+
+end test;

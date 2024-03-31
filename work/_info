@@ -1,0 +1,91 @@
+m255
+K4
+z2
+!s11e vcom 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dD:/FPGA/my projects/6. thermostat_1
+Et_tempmux
+Z0 w1711871479
+!i122 37
+Z1 dD:/FPGA/my projects/6. thermostat
+Z2 8D:/FPGA/my projects/6. thermostat/t_thermostat.vhd
+Z3 FD:/FPGA/my projects/6. thermostat/t_thermostat.vhd
+l0
+L1 1
+VmETEVbWdUJU7Kb62`5;;F1
+!s100 K=Q^0QQbCkCfBd8IENRRE3
+Z4 OV;C;2020.1;71
+32
+Z5 !s110 1711872234
+!i10b 1
+Z6 !s108 1711872233.000000
+Z7 !s90 -reportprogress|300|-work|work|D:/FPGA/my projects/6. thermostat/t_thermostat.vhd|
+Z8 !s107 D:/FPGA/my projects/6. thermostat/t_thermostat.vhd|
+!i113 1
+Z9 o-work work
+Z10 tExplicit 1 CvgOpt 0
+Atest
+DEx4 work 9 t_tempmux 0 22 mETEVbWdUJU7Kb62`5;;F1
+!i122 37
+l24
+L6 93
+VbCkbED2kiH2L1knkDXW9O3
+!s100 @WQUhT^D0RRC79oR6e4zC3
+R4
+32
+R5
+!i10b 1
+R6
+R7
+R8
+!i113 1
+R9
+R10
+Ethermostat_pins
+Z11 w1711868125
+Z12 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
+Z13 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z14 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
+!i122 38
+R1
+Z15 8D:/FPGA/my projects/6. thermostat/thermostat.vhd
+Z16 FD:/FPGA/my projects/6. thermostat/thermostat.vhd
+l0
+L5 1
+VVV9OnXT]Gdh5iCP?[8_o<1
+!s100 R=OI:TAlbd3KePAF22YA10
+R4
+32
+Z17 !s110 1711872236
+!i10b 1
+Z18 !s108 1711872236.000000
+Z19 !s90 -reportprogress|300|-work|work|D:/FPGA/my projects/6. thermostat/thermostat.vhd|
+Z20 !s107 D:/FPGA/my projects/6. thermostat/thermostat.vhd|
+!i113 1
+R9
+R10
+Athermostat_arch
+R12
+R13
+R14
+Z21 DEx4 work 15 thermostat_pins 0 22 VV9OnXT]Gdh5iCP?[8_o<1
+!i122 38
+l33
+Z22 L32 113
+Z23 VRA<h:WT62cDZe0`jW9_LT1
+Z24 !s100 MP65GXlA3[mLo8YLFh0DK1
+R4
+32
+R17
+!i10b 1
+R18
+R19
+R20
+!i113 1
+R9
+R10

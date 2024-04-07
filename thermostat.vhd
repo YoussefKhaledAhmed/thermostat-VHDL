@@ -18,6 +18,8 @@ port (current_temp : in bit_vector(6 downto 0);
       display_select : in bit;
       COOL         : in bit;
       HEAT         : in bit;
+      CLK          : in bit;
+      RESET        : in bit;
       temp_display : out bit_vector(6 downto 0);
       A_C_ON       : out Boolean;
       FURNACE_ON   : out Boolean);
@@ -30,7 +32,102 @@ end THERMOSTAT_pins;
 -->                                          is commented.
 --> 2. through AND, and OR operations.
 architecture THERMOSTAT_arch of THERMOSTAT_pins is
+
+  signal current_temp_reg , desired_temp_reg , temp_display_reg : bit_vector(6 downto 0);
+  signal display_select_reg , COOL_reg , HEAT_reg : bit;
+  signal A_C_ON_reg , FURNACE_ON_reg : Boolean;
+  
+
 begin
+
+-------------------------------------------------
+--        registering the I/O signals
+-------------------------------------------------
+  --> process to register the current_temp 
+  CURRENT_TEMP_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      current_temp_reg <= (others => '0');
+    elsif CLK'event and CLK = '1' then
+      current_temp_reg <= current_temp;
+    end if;
+  end process CURRENT_TEMP_REG_PROC;
+
+  --> process to register the desired_temp
+  DESIRED_TEMP_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      desired_temp_reg <= (others => '0');
+    elsif CLK'event and CLK = '1' then
+      desired_temp_reg <= desired_temp;
+    end if;
+  end process DESIRED_TEMP_REG_PROC;
+
+  --> process to assign the temp_display
+  TEMP_DISPLAY_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      temp_display <= (others => '0');
+    elsif CLK'event and CLK = '1' then
+      temp_display <= temp_display_reg;
+    end if;
+  end process TEMP_DISPLAY_REG_PROC;
+
+
+  --> process to register the display_select
+  DISPLAY_SEL_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      display_select_reg <= '0';
+    elsif CLK'event and CLK = '1' then
+      display_select_reg <= display_select;
+    end if;
+  end process DISPLAY_SEL_REG_PROC;
+
+  --> process to register the COOL
+  COOL_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      COOL_reg <= '0';
+    elsif CLK'event and CLK = '1' then
+      COOL_reg <= COOL;
+    end if;
+  end process COOL_REG_PROC;
+
+  --> process to register the HEAT
+  HEAT_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      HEAT_reg <= '0';
+    elsif CLK'event and CLK = '1' then
+      HEAT_reg <= HEAT;
+    end if;
+  end process HEAT_REG_PROC;
+
+  --> process to register the A_C_ON
+  A_C_ON_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      A_C_ON <= FALSE;
+    elsif CLK'event and CLK = '1' then
+      A_C_ON <= A_C_ON_reg;
+    end if;
+  end process A_C_ON_REG_PROC;
+
+  --> process to register the FURNACE_ON
+  FURNACE_ON_REG_PROC: process (CLK , RESET) is
+  begin
+    if RESET = '1' then
+      FURNACE_ON <= FALSE;
+    elsif CLK'event and CLK = '1' then
+      FURNACE_ON <= FURNACE_ON_reg;
+    end if;
+  end process FURNACE_ON_REG_PROC;
+
+
+-------------------------------------------------
+--            combinational logic
+-------------------------------------------------
 
   --> 1. 1st approach using if statement.
   ----------------------------------------------------------
@@ -39,16 +136,16 @@ begin
   -- 0 -> desired_temp
   -- 1 -> current_temp
   ----------------------------------------------------------
-  --process (current_temp,desired_temp,display_select)
+  --process (current_temp_reg,desired_temp_reg,display_select_reg)
   --begin 
 
-    --if display_select = '0' then
+    --if display_select_reg = '0' then
 
-      --temp_display <= desired_temp;
+      --temp_display_reg <= desired_temp_reg;
 
     --elsif display_select = '1' then
 
-      --temp_display <= current_temp;
+      --temp_display_reg <= current_temp_reg;
 
     --end if;
 
@@ -57,7 +154,7 @@ begin
 
 ---------------------------------------------------------------
   --> 2. 2nd approach using AND, and OR operations:
-  process (current_temp,desired_temp,display_select)
+  process (current_temp_reg,desired_temp_reg,display_select_reg)
     -- mask_temp: is an internal variable where it shall hold
     --            000000 -> if display_select = '0'
     --            111111 -> if display_select = '1'
@@ -67,7 +164,7 @@ begin
     -- case statement: to check whether the display_select is:
     -- 1. '0'
     -- 2. '1'
-    case display_select is
+    case display_select_reg is
       --> if display_select = '0' then assign mask_temp to 000000
       when '0' => mask_temp := (others => '0');
       --> if display_select = '1' then assign mask_temp to 111111
@@ -85,29 +182,31 @@ begin
     -->                          when: A --> desired_temp and (not mask_temp) -> 000000
     -->                                B --> current_temp and mask_temp -> current_temp
     -->                          then A or B -> current_temp.
-    temp_display <= ((desired_temp and (not mask_temp)) or (current_temp and mask_temp));
+    temp_display_reg <= ((desired_temp_reg and (not mask_temp)) or (current_temp_reg and mask_temp));
 
   end process;
 
+---------------------------------------------------------------------------------------------
+
   --> process to control the A/C
-  COOL_PROC : process (COOL , current_temp , desired_temp)
+  COOL_PROC : process (COOL_reg , current_temp_reg , desired_temp_reg)
   begin
     --> checking the value of the COOL signal 
-    case COOL is
+    case COOL_reg is
       --> case '0' -> turn off the A/C (i.e., A_C_ON <= FALSE)
-      when '0' => A_C_ON <= FALSE;
+      when '0' => A_C_ON_reg <= FALSE;
       
       --> case '1' -> check if the desired temp is less than the current temp
       -->             or not.
       when '1' => 
 	--> if the desired temp is less than the curren temp
 	--> then turn on the A/C (i.e., A_C_ON <= TRUE)
-	if desired_temp < current_temp then
-	  A_C_ON <= TRUE;
+	if desired_temp_reg < current_temp_reg then
+	  A_C_ON_reg <= TRUE;
 	
 	--> if not then turn off the A/C (i.e., A_C_ON <= FALSE)
 	else
-	  A_C_ON <= FALSE;
+	  A_C_ON_reg <= FALSE;
 	end if;
 
     end case;
@@ -115,26 +214,28 @@ begin
   end process COOL_PROC;
 
 
+---------------------------------------------------------------------------------------------
+
   --> process to control the furnace
-  HEAT_PROC : process (HEAT , current_temp , desired_temp)
+  HEAT_PROC : process (HEAT_reg , current_temp_reg , desired_temp_reg)
   begin
     --> checking the value of the HEAT signal 
-    case HEAT is
+    case HEAT_reg is
       --> case '0' -> turn off the furnace (i.e., FURNACE_ON <= FALSE)
       when '0' => 
-        FURNACE_ON <= FALSE;
+        FURNACE_ON_reg <= FALSE;
       
       --> case '1' -> check if the desired temp is greater than the current temp
       -->             or not.
       when '1' =>
 	--> if the desired temp greater than the curren temp
 	--> then turn on the furnace (i.e., FURNACE_ON <= TRUE)
-	if desired_temp > current_temp then
-	  FURNACE_ON <= TRUE;
+	if desired_temp_reg > current_temp_reg then
+	  FURNACE_ON_reg <= TRUE;
 	
 	--> if not then turn off the furnace (i.e., FURNACE_ON <= FALSE) 
 	else
-	  FURNACE_ON <= FALSE;
+	  FURNACE_ON_reg <= FALSE;
 	end if;
 
     end case;

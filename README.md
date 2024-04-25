@@ -1,8 +1,13 @@
 # thermostat-VHDL:
-## Block diagram:
+
+1. [block_diagram](#blockDiagram)
+2. [RTL_design_specifications](#RTLDesignSpecifications)
+
+
+## <a name="blockDiagram">**block_diagram**</a>:
 ![block diagram](https://github.com/YoussefKhaledAhmed/thermostat_RTL-VHDL/assets/101673979/66cfcae3-75f7-4d98-865b-d14a71bfc146)
 
-## RTL design specifications:
+## <a name="RTLDesignSpecifications">**RTL_design_specifications**</a>:
 1. adding all inputs and outputs to the entity:
    **inputs**:
      a. CURRENT_TEMP.
